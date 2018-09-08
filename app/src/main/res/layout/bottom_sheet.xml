@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.snivy.intelligentagriculture.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <include layout="@layout/content_main" />
+
+
+        <LinearLayout
+            android:id="@+id/bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="50dp"
+            app:layout_behavior="@string/bottom_sheet_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#eee"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/show_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:gravity="center"
+                    android:text="上划显示节点列表"
+                    android:textColor="#fff" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycle_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycle_view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/point_info_layout"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="#fff"-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:visibility="gone">-->
+
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="50dp"-->
+                        <!--android:background="#fff">-->
+
+                        <!--<TextView-->
+                            <!--android:id="@+id/point_info"-->
+                            <!--android:layout_width="0dp"-->
+                            <!--android:layout_height="match_parent"-->
+                            <!--android:layout_weight="2"-->
+                            <!--android:gravity="center"-->
+                            <!--android:text="fuck"-->
+                            <!--android:textSize="20sp" />-->
+                        <!--&lt;!&ndash;android:layout_marginLeft="10dp"&ndash;&gt;-->
+                        <!--<TextView-->
+                            <!--android:id="@+id/point_distance"-->
+                            <!--android:layout_width="0dp"-->
+                            <!--android:layout_height="match_parent"-->
+                            <!--android:layout_weight="10"-->
+                            <!--android:gravity="end|center_vertical"-->
+                            <!--android:text="800m"-->
+                            <!--android:textSize="14sp" />-->
+
+
+                    <!--</LinearLayout>-->
+
+
+                <!--</LinearLayout>-->
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </android.support.design.widget.CoordinatorLayout>
+</android.support.constraint.ConstraintLayout>
