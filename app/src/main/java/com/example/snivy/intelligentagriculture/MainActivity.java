@@ -2,6 +2,7 @@ package com.example.snivy.intelligentagriculture;
 
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.baidu.location.LocationClient;
@@ -29,6 +31,10 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.example.snivy.intelligentagriculture.Adapter.AllCtrlNodeAdapter;
+import com.example.snivy.intelligentagriculture.Adapter.InformationAdapter;
+import com.example.snivy.intelligentagriculture.Node;
+import com.example.snivy.intelligentagriculture.Adapter.oneNodeInfoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity
 
     public LocationClient mLocationClient;
 
-    public RecyclerView mRecyclerView, nodeRecycleView;
+    public RecyclerView mRecyclerView, nodeRecycleView, allCtrlNodeRecycleView;
 
     private ArrayList<Marker> markersList;
 
@@ -70,6 +76,7 @@ public class MainActivity extends AppCompatActivity
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
         myApp = (MyApp) getApplication();
+
         mapView = (MapView) findViewById(R.id.bmapView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,15 +87,15 @@ public class MainActivity extends AppCompatActivity
         baiduMap = mapView.getMap();
 
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mNodeSet.reflash();
+            }
+        });
 
+        //初始化抽屉
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -113,7 +120,10 @@ public class MainActivity extends AppCompatActivity
         nodeRecycleView.setLayoutManager(layoutManager2);
         nodeRecycleView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL){});
 
-
+        allCtrlNodeRecycleView = (RecyclerView) findViewById(R.id.recycle_view3);
+        LinearLayoutManager layoutManager3 = new LinearLayoutManager(this);
+        allCtrlNodeRecycleView.setLayoutManager(layoutManager3);
+        allCtrlNodeRecycleView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL){});
 
         //初始化点集合
         markersList = new ArrayList<>();
@@ -171,6 +181,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 InformationAdapter adapter = new InformationAdapter(m.mNodeSet.getAllNodes(), m.mLocationClient,m);
                 mRecyclerView.setAdapter(adapter);
+                AllCtrlNodeAdapter adapter2 = new AllCtrlNodeAdapter(m.mNodeSet.getAllCtrlNodes(), m.mLocationClient,m);
+                allCtrlNodeRecycleView.setAdapter(adapter2);
             }
         });
         mNodeSet.reflash();
@@ -179,31 +191,34 @@ public class MainActivity extends AppCompatActivity
         oneNodeInfo = new NodeSet(this, new NodeSet.RunAfter() {
             @Override
             public void run(MainActivity m) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//                m.mBottomSheetBehavior.setHideable(true);
                 oneNodeInfoAdapter adapter = new oneNodeInfoAdapter(m.oneNodeInfo.getAllNodes(), m.mLocationClient, m);
                 nodeRecycleView.setAdapter(adapter);
                 if (m.clickedNodeID == -1) {
-                    View tView = m.findViewById(R.id.recycle_view);
-                    tView.setVisibility(View.GONE);
-                    tView = m.findViewById(R.id.recycle_view2);
-                    tView.setVisibility(View.VISIBLE);
+                    TextView tTextView = (TextView) m.findViewById(R.id.show_list);
+//                    tTextView.setText("上划显示该节点所有信息");
+                    tTextView.setVisibility(View.GONE);
+                    nodeRecycleView.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.GONE);
+                    allCtrlNodeRecycleView.setVisibility(View.GONE);
+//                    tTextView.setVisibility(View.GONE);
 
-                    TextView tTextView = m.findViewById(R.id.show_list);
-                    tTextView.setText("上划显示该节点所有信息");
-                    float scale = m.getResources().getDisplayMetrics().density;
-                    m.mBottomSheetBehavior.setPeekHeight((int)(100 * scale + 0.5f));
+//                    tTextView.setVisibility(View.VISIBLE);
                 } else {
                     Marker marker = m.markersList.get(m.clickedNodeID);
                     marker.setIcon(m.bitmap);
                 }
-                m.mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//                m.mBottomSheetBehavior.setHideable(false);
                 m.clickedNodeID = m.tempID;
                 if (m.clickedByList) {
                     m.move_to_clicked_point();
                 }
-
             }
         });
     }
+
+
 
     public void move_to_clicked_point() {
         Node Node = mNodeSet.getNode(clickedNodeID);
@@ -213,6 +228,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void node_clicked(int tempID) {
+//        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         this.tempID = tempID;
         Marker marker = markersList.get(tempID);
         if (clickedNodeID == tempID) {
@@ -220,8 +236,12 @@ public class MainActivity extends AppCompatActivity
             MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(position);
             baiduMap.animateMapStatus(update);
         } else {
-            oneNodeInfo.reflash(tempID);
             marker.setIcon(bitmapI);
+            float scale = getResources().getDisplayMetrics().density;
+            mBottomSheetBehavior.setPeekHeight((int)(100 * scale + 0.5f));
+
+            oneNodeInfo.reflash(tempID);
+
 //            TextView textView = findViewById(R.id.point_info);
 //            textView.setText(mNodeSet.getNode(tempID).getType());
 //            textView = findViewById(R.id.point_distance);
@@ -260,10 +280,13 @@ public class MainActivity extends AppCompatActivity
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             TextView tTextView = findViewById(R.id.show_list);
             tTextView.setText("上划显示节点列表");
-            View tView = findViewById(R.id.recycle_view2);
-            tView.setVisibility(View.GONE);
-            tView = findViewById(R.id.recycle_view);
-            tView.setVisibility(View.VISIBLE);
+            tTextView.setVisibility(View.VISIBLE);
+            nodeRecycleView.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            allCtrlNodeRecycleView.setVisibility(View.VISIBLE);
+
+//            InformationAdapter adapter = new InformationAdapter(new ArrayList<Node>(), mLocationClient,this);
+//            nodeRecycleView.setAdapter(adapter);
         } else {
             mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
